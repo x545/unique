@@ -1,0 +1,12 @@
+// Microsoft Visual C++ generated Help ID include file.
+// Used by unique.rc
+//
+#define HIDC_COPY_FILES                 0x806603f3    // IDD_UNIQUE_DIALOG
+#define HIDC_DEST_PATH                  0x806603eb    // IDD_UNIQUE_DIALOG
+#define HIDC_FILES                      0x806603e9    // IDD_UNIQUE_DIALOG
+#define HIDC_MOVE_FILES                 0x806603f4    // IDD_UNIQUE_DIALOG
+#define HIDC_ONLY_SELECTED              0x806603ea    // IDD_UNIQUE_DIALOG
+#define HIDC_RENAME_FILES               0x806603ec    // IDD_UNIQUE_DIALOG
+#define HIDC_SEL_FILES                  0x806603ef    // IDD_UNIQUE_DIALOG
+#define HIDC_SEL_PATH                   0x806603ee    // IDD_UNIQUE_DIALOG
+#define HIDC_SYNC_FILES                 0x806603ed    // IDD_UNIQUE_DIALOG
