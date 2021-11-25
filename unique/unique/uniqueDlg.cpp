@@ -53,7 +53,7 @@ END_MESSAGE_MAP()
 
 CuniqueDlg::CuniqueDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CuniqueDlg::IDD, pParent)
-	, m_strDEST_PATH(_T(''))
+	, m_strDEST_PATH(_T(""))
 	, m_radCOPY_FILESorMOVE_FILES(0)
 	, m_editRENAME_APPENDIX(_T("ren%d"))
 {

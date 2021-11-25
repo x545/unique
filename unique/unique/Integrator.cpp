@@ -152,7 +152,7 @@ void Integrator::integrateFiles(void)
 CString Integrator::changeFileName(const CString *strFileName, const CString *strAppend)
 {
 	int pos = strFileName->ReverseFind(_T('.'));
-	CString strExtension = _T('');
+	CString strExtension = _T("");
 	CString strFileNameWithoutExtension = *strFileName;
 	if ( pos != -1 )
 	{
