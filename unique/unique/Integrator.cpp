@@ -21,7 +21,7 @@ Integrator::~Integrator(void) {
 void Integrator::rename(CString strAppend /* = _T("ren%d") */)
 {
 	getFilesInPath();
-	for (POSITION pos = m_strListFiles.GetHeadPosition(); pos != NULL; )
+	for (POSITION pos = m_strListFiles.GetHeadPosition(); NULL != pos; )
 	{
 		CString strNextFile = m_strListFiles.GetNext(pos);
 		strNextFile = getFileName(&strNextFile);
@@ -43,7 +43,7 @@ void Integrator::sync(void)
 {
 	getFilesInPath();
 	POSITION posOld;
-	for (POSITION pos = m_strListFiles.GetHeadPosition(); (posOld = pos) != NULL; )
+	for (POSITION pos = m_strListFiles.GetHeadPosition(); NULL != (posOld = pos); )
 	{
 		CString strNextFile = m_strListFiles.GetNext(pos);
 		strNextFile = getFileName(&strNextFile);
@@ -81,7 +81,7 @@ CString Integrator::getFileName(const CString *pstrFullFileName)
 {
 	int pos = pstrFullFileName->ReverseFind(_T('\\'));
 	ASSERT(pos != -1);	// Upps: given FullFileName doesn't contain '\' -- is he wrong?
-	return pstrFullFileName->Right(pstrFullFileName->GetLength() - pos-1);
+	return pstrFullFileName->Right(pstrFullFileName->GetLength() - pos - 1);
 }
 
 bool Integrator::alsoInFilesInPath(const CString* pstrFileName)
@@ -108,7 +108,7 @@ void Integrator::integrateFiles(void)
 #ifdef _DEBUG			
 			TRACE(_T("integrate file: %s into: %s\n"), strInFileName, strOutFileName);
 #endif //_DEBUG
-			#define BUFFER_SIZE 4096
+			constexpr auto BUFFER_SIZE = 4096;
 			CFile in, out;
 			CFileException e;
 			CString s;
@@ -139,7 +139,7 @@ void Integrator::integrateFiles(void)
 					in.Remove(strInFileName);
 				}
 			}
-			catch( CFileException* e )
+			catch(CFileException* e)
 			{
 				in.Abort();
 				out.Abort();
@@ -151,10 +151,10 @@ void Integrator::integrateFiles(void)
 
 CString Integrator::changeFileName(const CString *strFileName, const CString *strAppend)
 {
-	int pos = strFileName->ReverseFind(_T('.'));
+	const int pos = strFileName->ReverseFind(_T('.'));
 	CString strExtension = _T("");
 	CString strFileNameWithoutExtension = *strFileName;
-	if ( pos != -1 )
+	if (-1 != pos)
 	{
 		strFileNameWithoutExtension = strFileName->Left(pos);
 		strExtension = strFileName->Right(strFileName->GetLength() - pos);
