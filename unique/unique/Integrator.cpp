@@ -7,33 +7,34 @@
 #include "StdAfx.h"
 #include "integrator.h"
 
+
 Integrator::~Integrator(void) {
-	if (!m_strListFiles.IsEmpty())
+	if (!m_files.IsEmpty())
 	{
-		m_strListFiles.RemoveAll();
+		m_files.RemoveAll();
 	}
-	if (!m_strListTargetFiles.IsEmpty())
+	if (!m_targetFiles.IsEmpty())
 	{
-		m_strListTargetFiles.RemoveAll();
+		m_targetFiles.RemoveAll();
 	}
 }
 
-void Integrator::rename(CString strAppend /* = _T("ren%d") */)
+void Integrator::rename(const CString append /* = _T("ren%d") */)
 {
 	getFilesInPath();
-	for (POSITION pos = m_strListFiles.GetHeadPosition(); NULL != pos; )
+	for (POSITION pos = m_files.GetHeadPosition(); NULL != pos; )
 	{
-		CString strNextFile = m_strListFiles.GetNext(pos);
+		CString strNextFile = m_files.GetNext(pos);
 		strNextFile = getFileName(&strNextFile);
 		
 		// if file already exists: rename
 		if ( alsoInFilesInPath(&strNextFile)  )
 		{
-			m_strListTargetFiles.AddTail( m_strDestPath + changeFileName(&strNextFile, &strAppend) );
+			m_targetFiles.AddTail( m_strDestPath + changeFileName(&strNextFile, &append) );
 		}
 		else
 		{
-			m_strListTargetFiles.AddTail( m_strDestPath + strNextFile );
+			m_targetFiles.AddTail( m_strDestPath + strNextFile );
 		}
 	}
 	integrateFiles();
@@ -43,19 +44,19 @@ void Integrator::sync(void)
 {
 	getFilesInPath();
 	POSITION posOld;
-	for (POSITION pos = m_strListFiles.GetHeadPosition(); NULL != (posOld = pos); )
+	for (POSITION pos = m_files.GetHeadPosition(); NULL != (posOld = pos); )
 	{
-		CString strNextFile = m_strListFiles.GetNext(pos);
+		CString strNextFile = m_files.GetNext(pos);
 		strNextFile = getFileName(&strNextFile);
 		
 		// if file already exists: skip and delete file in m_strListFiles to keep lists in sync
 		if ( alsoInFilesInPath(&strNextFile)  )
 		{
-			m_strListFiles.RemoveAt(posOld);
+			m_files.RemoveAt(posOld);
 		}
 		else
 		{
-			m_strListTargetFiles.AddTail( m_strDestPath + strNextFile );
+			m_targetFiles.AddTail( m_strDestPath + strNextFile );
 		}
 	}
 	integrateFiles();
@@ -77,18 +78,18 @@ void Integrator::getFilesInPath(void)
 	}
 }
 
-CString Integrator::getFileName(const CString *pstrFullFileName)
+CString Integrator::getFileName(const CString *fullFileName)
 {
-	int pos = pstrFullFileName->ReverseFind(_T('\\'));
-	ASSERT(pos != -1);	// Upps: given FullFileName doesn't contain '\' -- is he wrong?
-	return pstrFullFileName->Right(pstrFullFileName->GetLength() - pos - 1);
+	const int pos = fullFileName->ReverseFind(_T('\\'));
+	ASSERT(pos != -1);	// Ups: given FullFileName doesn't contain '\' -- is he wrong?
+	return fullFileName->Right(fullFileName->GetLength() - pos - 1);
 }
 
-bool Integrator::alsoInFilesInPath(const CString* pstrFileName)
+bool Integrator::alsoInFilesInPath(const CString *fileName)
 {
 	for ( POSITION pos = m_filesInPath.GetHeadPosition(); pos != NULL; ) 
 	{
-		if ( m_filesInPath.GetNext(pos) == *pstrFileName )
+		if ( m_filesInPath.GetNext(pos) == *fileName )
 		{
 			return true;
 		}
@@ -98,13 +99,13 @@ bool Integrator::alsoInFilesInPath(const CString* pstrFileName)
 
 void Integrator::integrateFiles(void)
 {
-	POSITION pos2 = m_strListTargetFiles.GetHeadPosition();
-	if (pos2)
+	POSITION headPos = m_targetFiles.GetHeadPosition();
+	if (headPos)
 	{
-		for ( POSITION pos = m_strListFiles.GetHeadPosition(); pos != NULL; ) 
+		for ( POSITION pos = m_files.GetHeadPosition(); pos != NULL; ) 
 		{
-			CString strInFileName = m_strListFiles.GetNext(pos);
-			CString strOutFileName = m_strListTargetFiles.GetNext(pos2);
+			CString strInFileName = m_files.GetNext(pos);
+			CString strOutFileName = m_targetFiles.GetNext(headPos);
 #ifdef _DEBUG			
 			TRACE(_T("integrate file: %s into: %s\n"), strInFileName, strOutFileName);
 #endif //_DEBUG
@@ -139,37 +140,38 @@ void Integrator::integrateFiles(void)
 					in.Remove(strInFileName);
 				}
 			}
-			catch(CFileException* e)
+			catch(CFileException* ex)
 			{
 				in.Abort();
 				out.Abort();
-				e->ReportError();
+				ex->ReportError();
 			}
 		}
 	}
 }
 
-CString Integrator::changeFileName(const CString *strFileName, const CString *strAppend)
+CString Integrator::changeFileName(const CString *fileName, const CString *append)
 {
-	const int pos = strFileName->ReverseFind(_T('.'));
+	const int pos = fileName->ReverseFind(_T('.'));
 	CString strExtension = _T("");
-	CString strFileNameWithoutExtension = *strFileName;
+	CString strFileNameWithoutExtension = *fileName;
 	if (-1 != pos)
 	{
-		strFileNameWithoutExtension = strFileName->Left(pos);
-		strExtension = strFileName->Right(strFileName->GetLength() - pos);
+		strFileNameWithoutExtension = fileName->Left(pos);
+		strExtension = fileName->Right(fileName->GetLength() - pos);
 	}
 	unsigned int i = 0;
-	CString strAndNumberToAppend = *strAppend;
-	strAndNumberToAppend.Format(*strAppend, i);
-	while (  alsoInFilesInPath( &(strFileNameWithoutExtension + strAndNumberToAppend + strExtension) )  )
+	CString strAndNumberToAppend = *append;
+	strAndNumberToAppend.Format(*append, i);
+	auto newFileName = strFileNameWithoutExtension + strAndNumberToAppend + strExtension;
+	while (alsoInFilesInPath(&newFileName))
 	{
-		strAndNumberToAppend.Format(*strAppend, ++i);
+		strAndNumberToAppend.Format(*append, ++i);
 	}
 	return strFileNameWithoutExtension + strAndNumberToAppend + strExtension;
 }
 
-void Integrator::moveWhileIntegrating(bool move)
+void Integrator::moveWhileIntegrating(const bool doMove) noexcept
 {
-	move ? this->m_moveWhileIntegrating = TRUE : this->m_moveWhileIntegrating = FALSE;
+	doMove ? this->m_moveWhileIntegrating = TRUE : this->m_moveWhileIntegrating = FALSE;
 }

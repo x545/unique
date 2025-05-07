@@ -10,33 +10,38 @@ class Integrator
 {
 public:
 	~Integrator(void);
-	void rename(CString strAppend = _T("ren%d"));
+	Integrator(const Integrator&) = delete;
+	Integrator(Integrator&&) = delete;
+	Integrator& operator=(const Integrator&) = delete;
+	Integrator& operator=(Integrator&&) = delete;
+	void rename(const CString strAppend = _T("ren%d"));
 	void sync(void);
-	void moveWhileIntegrating(bool move);
+	void moveWhileIntegrating(const bool move) noexcept;
 
 
-inline Integrator::Integrator(void)
+inline Integrator(void) noexcept
 { 
 	m_moveWhileIntegrating = TRUE;
-	m_strListFiles.RemoveAll();
-	m_strListTargetFiles.RemoveAll();
+	m_files.RemoveAll();
+	m_targetFiles.RemoveAll();
 	m_filesInPath.RemoveAll();
 }
-//inline Integrator(CStringList *pstrListFiles) { this->m_strListFiles.AddTail(pstrListFiles); }
-inline void setTargetDirectory(const CString* pstrPath) { this->m_strDestPath = *pstrPath; }
-inline void addFile(const CString* pstrFile)
+//inline Integrator(CStringList *listFiles) { this->m_listFiles.AddTail(listFiles); }
+inline void setTargetDirectory(const CString* path) { this->m_strDestPath = *path; }
+inline void addFile(const CString* fileName)
 {
-	POSITION pos = this->m_strListFiles.AddTail(*pstrFile);
+	this->m_files.AddTail(*fileName);
 }
+
 private:
-	CStringList m_strListFiles;
-	CStringList m_strListTargetFiles;
+	CStringList m_files;
+	CStringList m_targetFiles;
 	CStringList m_filesInPath;
 	CString m_strDestPath;
 	void getFilesInPath();
-	CString getFileName(const CString *pstrFullFileName);
-	bool alsoInFilesInPath(const CString *pstrFileName);
+	CString getFileName(const CString *fullFileName);
+	bool alsoInFilesInPath(const CString *fileName);
 	void integrateFiles(void);
-	CString changeFileName(const CString *strFileName, const CString *strAppend);
+	CString changeFileName(const CString *fileName, const CString *append);
 	bool m_moveWhileIntegrating;
 };

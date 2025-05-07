@@ -9,7 +9,10 @@
 
 #pragma once
 
+#include <memory>
 #include "Integrator.h"
+
+using namespace std;
 
 // CuniqueDlg Dialogfeld
 class CuniqueDlg : public CDialogEx
@@ -17,7 +20,7 @@ class CuniqueDlg : public CDialogEx
 // Konstruktion
 public:
 	CuniqueDlg(CWnd *pParent = NULL);	// Standardkonstruktor
-	~CuniqueDlg();
+	//~CuniqueDlg();
 	
 	// call this function when Integrator has done work and GUI should show results
 	void afterIntegrator(void);
@@ -37,14 +40,13 @@ protected:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();
-	afx_msg HCURSOR OnQueryDragIcon();
+	afx_msg HCURSOR OnQueryDragIcon() noexcept;
 	afx_msg void OnBnClickedSelFiles();
 	afx_msg void OnBnClickedRenameFiles();
 	afx_msg void OnBnClickedSyncFiles();
 	afx_msg void OnBnClickedSelPath();
-	DECLARE_MESSAGE_MAP()
+	DECLARE_MESSAGE_MAP();
 
-protected:
 	void insertIn_m_listFILES(CString *file);
 	void initIntegrator();
 	void mayChangeIntegrateButtons();
@@ -60,10 +62,10 @@ protected:
 
 private:
 	int m_listFILEScount;
-	Integrator *m_integrator;
+	unique_ptr<Integrator> m_integrator;
+	constexpr static auto BUFFER_SIZE = 102400;
 
 public:
-	afx_msg void OnEnChangeDestPath();
 	afx_msg void OnEnKillfocusAppendix();
 	afx_msg void OnLvnKeydownFiles(NMHDR *pNMHDR, LRESULT *pResult);
 };

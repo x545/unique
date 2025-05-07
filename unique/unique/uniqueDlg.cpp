@@ -14,6 +14,7 @@
 #define new DEBUG_NEW
 #endif
 
+using namespace std;
 
 // CAboutDlg-Dialogfeld für Anwendungsbefehl 'Info'
 
@@ -25,12 +26,12 @@ public:
 // Dialogfelddaten
 	enum { IDD = IDD_ABOUTBOX };
 
-	protected:
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV-Unterstützung
 
 // Implementierung
 protected:
-	DECLARE_MESSAGE_MAP()
+	DECLARE_MESSAGE_MAP();
 };
 
 CAboutDlg::CAboutDlg() : CDialogEx(CAboutDlg::IDD)
@@ -51,24 +52,22 @@ END_MESSAGE_MAP()
 
 
 
-CuniqueDlg::CuniqueDlg(CWnd* pParent /*=NULL*/)
-	: CDialogEx(CuniqueDlg::IDD, pParent)
+CuniqueDlg::CuniqueDlg(CWnd* parent /*=NULL*/)
+	: CDialogEx(CuniqueDlg::IDD, parent)
 	, m_strDEST_PATH(_T(""))
 	, m_radCOPY_FILESorMOVE_FILES(0)
 	, m_editRENAME_APPENDIX(_T("ren%d"))
 {
 	EnableActiveAccessibility();
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+	m_listFILEScount = 0;						// Pointer to the last file of m_listFILES
 }
 
-CuniqueDlg::~CuniqueDlg()
+/*CuniqueDlg::~CuniqueDlg() noexcept
 {
-	if (this->m_integrator) {
-		delete m_integrator;
-	}
-	// deaktiviert, sonst Exception mit VS 10 
+	deaktiviert, sonst Exception mit VS 10 
 	// CDialog::~CDialog();
-}
+}*/
 
 void CuniqueDlg::DoDataExchange(CDataExchange* pDX)
 {
@@ -128,10 +127,9 @@ BOOL CuniqueDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// Großes Symbol verwenden
 	SetIcon(m_hIcon, FALSE);		// Kleines Symbol verwenden
 
-	// Initalisations
+	// Initializations
 	
 	this->m_strDEST_PATH = _T("");
-	this->m_listFILEScount = 0;								// Pointer to the last file of m_listFILES
 	this->m_listFILES.SetExtendedStyle(LVS_EX_CHECKBOXES);	// Markers before files in ListFILES
 	this->m_checkONLY_SELECTED.SetCheck(BST_CHECKED);		// set already checked
 	this->m_integrator = NULL;								// !existing
@@ -166,12 +164,12 @@ void CuniqueDlg::OnPaint()
 		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
 
 		// Symbol in Clientrechteck zentrieren
-		int cxIcon = GetSystemMetrics(SM_CXICON);
-		int cyIcon = GetSystemMetrics(SM_CYICON);
+		const int cxIcon = GetSystemMetrics(SM_CXICON);
+		const int cyIcon = GetSystemMetrics(SM_CYICON);
 		CRect rect;
 		GetClientRect(&rect);
-		int x = (rect.Width() - cxIcon + 1) / 2;
-		int y = (rect.Height() - cyIcon + 1) / 2;
+		const int x = (rect.Width() - cxIcon + 1) / 2;
+		const int y = (rect.Height() - cyIcon + 1) / 2;
 
 		// Symbol zeichnen
 		dc.DrawIcon(x, y, m_hIcon);
@@ -184,22 +182,21 @@ void CuniqueDlg::OnPaint()
 
 // Die System ruft diese Funktion auf, um den Cursor abzufragen, der angezeigt wird, während der Benutzer
 //  das minimierte Fenster mit der Maus zieht.
-HCURSOR CuniqueDlg::OnQueryDragIcon()
+HCURSOR CuniqueDlg::OnQueryDragIcon() noexcept
 {
-	return static_cast<HCURSOR>(m_hIcon);
+	return m_hIcon;
 }
 
 void CuniqueDlg::OnBnClickedSelFiles()
 {
-#define BUFFER 102400 
-	TCHAR buffer[BUFFER];
+	TCHAR buffer[BUFFER_SIZE];
 	buffer[0] = 0;
 	CFileDialog fdlg(TRUE, _T("*"), _T("*.*"), OFN_ALLOWMULTISELECT | OFN_FILEMUSTEXIST
 					| OFN_HIDEREADONLY | OFN_ENABLESIZING | OFN_EXPLORER, 
 					_T("All files (*.*)|*.*|Pictures (*.jpg; *.jpeg; *.bmp; *.gif; *.png)|*.jpg;*.jpeg;*.bmp;*.gif;*.png|Movies (*.avi; *.mov; *.wma; *.wmv; *.asf; *.mpg; *.mpeg)|*.avi;*.mov;*.wma;*.wmv;*.asf;*.mpg;*.mpeg||")); 
 	fdlg.m_ofn.lpstrTitle = _T("select files...");
 	fdlg.m_ofn.lpstrFile = buffer;
-	fdlg.m_ofn.nMaxFile = BUFFER;
+	fdlg.m_ofn.nMaxFile = BUFFER_SIZE;
 	if (fdlg.DoModal() == IDOK)
 	{
 		CString nextFile;
@@ -229,12 +226,12 @@ void CuniqueDlg::mayChangeIntegrateButtons()
 		m_butnSYNC_FILES.EnableWindow(FALSE);
 	}
 }
-void CuniqueDlg::insertIn_m_listFILES(CString *pstrFile)
+void CuniqueDlg::insertIn_m_listFILES(CString *fileName)
 {
 	LVFINDINFO info;
 	
 	info.flags = LVFI_STRING;
-	info.psz = pstrFile->GetBuffer(0);
+	info.psz = fileName->GetBuffer(0);
 
 	int pos_search;
 	if (  ( pos_search = m_listFILES.FindItem(&info) ) != -1  ) return; //file already in list
@@ -244,8 +241,8 @@ void CuniqueDlg::insertIn_m_listFILES(CString *pstrFile)
 	lvI.mask = LVIF_TEXT;
 	
 	lvI.iItem = m_listFILEScount;
-	lvI.pszText = pstrFile->GetBuffer(0);
-	pstrFile->ReleaseBuffer();
+	lvI.pszText = fileName->GetBuffer(0);
+	fileName->ReleaseBuffer();
 	m_listFILES.InsertItem(&lvI);
 	m_listFILES.SetCheck(m_listFILEScount++);
 		
@@ -279,36 +276,36 @@ void CuniqueDlg::afterIntegrator(void)
 
 	mayChangeIntegrateButtons();
 	
-	delete m_integrator;
 	this->m_integrator = NULL;
-
 }
 
 void CuniqueDlg::initIntegrator(void)
 {
-	if (!this->m_integrator)
-	{
-		m_integrator = new Integrator();
-	}
+   if (!this->m_integrator)
+   {
+       m_integrator = make_unique<Integrator>(); // Use std::make_unique with the std namespace
+   }
 
-	m_integrator->setTargetDirectory(&m_strDEST_PATH);
-	for (int pos = 0; pos < m_listFILEScount; pos++)
-	{
-		if ( m_checkONLY_SELECTED.GetState() & 0x0003 )
-		{
-			if ( m_listFILES.GetCheck(pos) ) 
-			{
-				m_integrator->addFile( &m_listFILES.GetItemText(pos, 0) );
-			}
-		}
-		else
-		{
-			m_integrator->addFile( &m_listFILES.GetItemText(pos, 0) );
-		}
-	}
-	UpdateData();
-	m_radCOPY_FILESorMOVE_FILES ? this->m_integrator->moveWhileIntegrating(TRUE)
-								: this->m_integrator->moveWhileIntegrating(FALSE);
+   m_integrator->setTargetDirectory(&m_strDEST_PATH);
+   for (int pos = 0; pos < m_listFILEScount; pos++)
+   {
+       if (m_checkONLY_SELECTED.GetState() & 0x0003)
+       {
+           if (m_listFILES.GetCheck(pos))
+           {
+			   auto checkedPos = m_listFILES.GetItemText(pos, 0);
+               m_integrator->addFile(&checkedPos);
+           }
+       }
+       else
+       {
+		   auto allPos = m_listFILES.GetItemText(pos, 0);
+           m_integrator->addFile(&allPos);
+       }
+   }
+   UpdateData();
+   m_radCOPY_FILESorMOVE_FILES ? this->m_integrator->moveWhileIntegrating(TRUE)
+                               : this->m_integrator->moveWhileIntegrating(FALSE);
 }
 
 void CuniqueDlg::OnBnClickedSelPath(void)
@@ -355,13 +352,13 @@ void CuniqueDlg::OnEnKillfocusAppendix()
 {
 	CString old_m_editRENAME_APPENDIX = m_editRENAME_APPENDIX;
 	UpdateData();			// get new appendix
-	int pos = m_editRENAME_APPENDIX.Find(_T("%d"));
+	const int pos = m_editRENAME_APPENDIX.Find(_T("%d"));
 	if (  (pos == -1)
 		  || (m_editRENAME_APPENDIX.Find(_T('%'), pos + 2) != -1) 
 		  || m_editRENAME_APPENDIX.Find(_T('%')) < pos  )
 	{
 		CString str_errMsg;
-		str_errMsg.LoadString(IDS_INCORRECT_RENAME_APPENDIX);
+		const int lenUnused = str_errMsg.LoadString(IDS_INCORRECT_RENAME_APPENDIX);
 		::MessageBox(NULL, str_errMsg, _T("unique") , MB_ICONSTOP | MB_OK);
 
 		m_editRENAME_APPENDIX = old_m_editRENAME_APPENDIX;
@@ -371,11 +368,12 @@ void CuniqueDlg::OnEnKillfocusAppendix()
 
 void CuniqueDlg::OnLvnKeydownFiles(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	LPNMLVKEYDOWN pLVKeyDown = reinterpret_cast<LPNMLVKEYDOWN>(pNMHDR);
-	if ( pLVKeyDown->wVKey == VK_DELETE )
+	const LPNMLVKEYDOWN pLVKeyDown = reinterpret_cast<LPNMLVKEYDOWN>(pNMHDR);
+	if (pLVKeyDown->wVKey == VK_DELETE)
 	{
 		POSITION pos = m_listFILES.GetFirstSelectedItemPosition();
-		unsigned int del_positions[BUFFER], i = 0;
+		unsigned int del_positions[BUFFER_SIZE] = { 0 };
+		unsigned int i = 0;
 		
 		while (pos)
 		{

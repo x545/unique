@@ -12,7 +12,6 @@
 #define new DEBUG_NEW
 #endif
 
-
 // CuniqueApp
 
 BEGIN_MESSAGE_MAP(CuniqueApp, CWinApp)
@@ -66,7 +65,7 @@ BOOL CuniqueApp::InitInstance()
 
 	// Shell-Manager erstellen, falls das Dialogfeld
 	// Shellstrukturansicht- oder Shelllistenansicht-Steuerelemente enthält.
-	CShellManager *pShellManager = new CShellManager;
+	auto *pShellManager = new CShellManager;
 
 	// Standardinitialisierung
 	// Wenn Sie diese Features nicht verwenden und die Größe
@@ -79,7 +78,7 @@ BOOL CuniqueApp::InitInstance()
 
 	CuniqueDlg dlg;
 	m_pMainWnd = &dlg;
-	INT_PTR nResponse = dlg.DoModal();
+	const INT_PTR nResponse = dlg.DoModal();
 	if (nResponse == IDOK)
 	{
 		// TODO: Fügen Sie hier Code ein, um das Schließen des
