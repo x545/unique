@@ -1,5 +1,5 @@
-/* 
- * Copyright 2002 - 2010 by x545, x545@gmx.net
+ï»¿/* 
+ * Copyright 2002 - 2025 by x545, x545@gmx.net
  */
 
 // $Id$
@@ -23,12 +23,12 @@ END_MESSAGE_MAP()
 
 CuniqueApp::CuniqueApp()
 {
-	// Neustart-Manager unterstützen
+	// Neustart-Manager unterstÃ¼tzen
 	m_dwRestartManagerSupportFlags = AFX_RESTART_MANAGER_SUPPORT_RESTART;
 
 	EnableHtmlHelp();
 
-	// TODO: Hier Code zur Konstruktion einfügen
+	// TODO: Hier Code zur Konstruktion einfÃ¼gen
 	// Alle wichtigen Initialisierungen in InitInstance positionieren
 }
 
@@ -42,13 +42,13 @@ CuniqueApp theApp;
 
 BOOL CuniqueApp::InitInstance()
 {
-	// InitCommonControlsEx() ist für Windows XP erforderlich, wenn ein Anwendungsmanifest
-	// die Verwendung von ComCtl32.dll Version 6 oder höher zum Aktivieren
+	// InitCommonControlsEx() ist fÃ¼r Windows XP erforderlich, wenn ein Anwendungsmanifest
+	// die Verwendung von ComCtl32.dll Version 6 oder hÃ¶her zum Aktivieren
 	// von visuellen Stilen angibt. Ansonsten treten beim Erstellen von Fenstern Fehler auf.
-	INITCOMMONCONTROLSEX InitCtrls;
+	INITCOMMONCONTROLSEX InitCtrls{};
 	InitCtrls.dwSize = sizeof(InitCtrls);
 	// Legen Sie dies fest, um alle allgemeinen Steuerelementklassen einzubeziehen,
-	// die Sie in Ihrer Anwendung verwenden möchten.
+	// die Sie in Ihrer Anwendung verwenden mÃ¶chten.
 	InitCtrls.dwICC = ICC_WIN95_CLASSES;
 	InitCommonControlsEx(&InitCtrls);
 
@@ -64,15 +64,15 @@ BOOL CuniqueApp::InitInstance()
 	AfxEnableControlContainer();
 
 	// Shell-Manager erstellen, falls das Dialogfeld
-	// Shellstrukturansicht- oder Shelllistenansicht-Steuerelemente enthält.
+	// Shellstrukturansicht- oder Shelllistenansicht-Steuerelemente enthÃ¤lt.
 	auto *pShellManager = new CShellManager;
 
 	// Standardinitialisierung
-	// Wenn Sie diese Features nicht verwenden und die Größe
-	// der ausführbaren Datei verringern möchten, entfernen Sie
+	// Wenn Sie diese Features nicht verwenden und die GrÃ¶ÃŸe
+	// der ausfÃ¼hrbaren Datei verringern mÃ¶chten, entfernen Sie
 	// die nicht erforderlichen Initialisierungsroutinen.
-	// Ändern Sie den Registrierungsschlüssel, unter dem Ihre Einstellungen gespeichert sind.
-	// TODO: Ändern Sie diese Zeichenfolge entsprechend,
+	// Ã„ndern Sie den RegistrierungsschlÃ¼ssel, unter dem Ihre Einstellungen gespeichert sind.
+	// TODO: Ã„ndern Sie diese Zeichenfolge entsprechend,
 	// z.B. zum Namen Ihrer Firma oder Organisation.
 	//SetRegistryKey(_T("Vom lokalen Anwendungs-Assistenten generierte Anwendungen"));
 
@@ -81,22 +81,22 @@ BOOL CuniqueApp::InitInstance()
 	const INT_PTR nResponse = dlg.DoModal();
 	if (nResponse == IDOK)
 	{
-		// TODO: Fügen Sie hier Code ein, um das Schließen des
-		//  Dialogfelds über OK zu steuern
+		// TODO: FÃ¼gen Sie hier Code ein, um das SchlieÃŸen des
+		//  Dialogfelds Ã¼ber OK zu steuern
 	}
 	else if (nResponse == IDCANCEL)
 	{
-		// TODO: Fügen Sie hier Code ein, um das Schließen des
-		//  Dialogfelds über "Abbrechen" zu steuern
+		// TODO: FÃ¼gen Sie hier Code ein, um das SchlieÃŸen des
+		//  Dialogfelds Ã¼ber "Abbrechen" zu steuern
 	}
 
-	// Den oben erstellten Shell-Manager löschen.
+	// Den oben erstellten Shell-Manager lÃ¶schen.
 	if (pShellManager != NULL)
 	{
 		delete pShellManager;
 	}
 
-	// Da das Dialogfeld geschlossen wurde, FALSE zurückliefern, so dass wir die
+	// Da das Dialogfeld geschlossen wurde, FALSE zurÃ¼ckliefern, so dass wir die
 	// Anwendung verlassen, anstatt das Nachrichtensystem der Anwendung zu starten.
 	return FALSE;
 }

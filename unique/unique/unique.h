@@ -1,5 +1,5 @@
 /* 
- * Copyright 2002 - 2010 by x545, x545@gmx.net
+ * Copyright 2002 - 2025 by x545, x545@gmx.net
  */
 
 // $Id$
